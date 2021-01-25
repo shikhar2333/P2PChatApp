@@ -4,7 +4,15 @@ from threading import Thread
 import time
 from dbMethods import DBMethods
 import serverUtils as sUtils
+import gensafeprime
 
+def get_generator(p):
+    one = 1
+    gen = 0
+    while one == 1:
+        gen = randint(2, p-2)
+        one = pow(gen, 2, p)
+    return gen
 
 CONNECTED_CLIENTS = []
 MAX_CLIENTS = 10
@@ -113,48 +121,32 @@ def listenToClient(client_socket, client_address):
                                         u_name = decoded.split(" ")[-1]
                                         dict_socket = get_client_socket(u_name)
                                         dict_socket.send(bytes((decoded), "UTF-8"))
-                                    # elif request[0] == 'SEND':
-                                    #     hasSent = False
-                                    #     # start a communincation server on Client B
-                                        
-                                    #     for client_dict in CONNECTED_CLIENTS:
-                                    #         for dict_username, dict_socket in client_dict.items():
-                                    #             if dict_username == request[1]:
-                                    #                 hasSent = True
-                                    #                 # dict_socket.send(bytes(("Message from " + username + ": " + decoded),"UTF-8"))
-                                    #                 dict_socket.send(bytes(("Start server " + username),"UTF-8"))
 
-                                    #     if not hasSent:
-                                    #         storedMessage = messageObject(sender=username, recipient=request[1],
-                                    #                                       message=" ".join(request).split(" ", 1)[1])
-                                    #         arrayOfStoredMessages.append(storedMessage)
-                                    #         print("storedMessage: " + storedMessage.getMessage())
-                                    elif request[0] == '/something':
-                                        dict_socket.send(bytes("I did something", "UTF-8"))
+                                    # elif request[0] == '/something':
+                                    #     dict_socket.send(bytes("I did something", "UTF-8"))
                                     
-                                    elif request[0] == 'JOIN':
-                                        if request[1] not in GROUPS.keys():
-                                            GROUPS[str(request[1])]=[]
-                                            dict_socket.send(bytes("Group Created", "UTF-8"))
+                                    # elif request[0] == 'JOIN':
+                                    #     if request[1] not in GROUPS.keys():
+                                    #         GROUPS[str(request[1])]=[]
+                                    #         dict_socket.send(bytes("Group Created", "UTF-8"))
                                         
-                                        GROUPS[str(request[1])].append(username)
-                                        dict_socket.send(bytes("You are added to group", "UTF-8"))
+                                    #     GROUPS[str(request[1])].append(username)
+                                    #     dict_socket.send(bytes("You are added to group", "UTF-8"))
 
 
-                                    elif request[0] == 'CREATE':
-                                        if request[1] in GROUPS.keys():
-                                            dict_socket.send(bytes("Group already exists", "UTF-8"))
-                                        else:    
-                                            GROUPS[str(request[1])]=[]
-                                            dict_socket.send(bytes("Group Created", "UTF-8"))
+                                    # elif request[0] == 'CREATE':
+                                    #     if request[1] in GROUPS.keys():
+                                    #         dict_socket.send(bytes("Group already exists", "UTF-8"))
+                                    #     else:    
+                                    #         GROUPS[str(request[1])]=[]
+                                    #         dict_socket.send(bytes("Group Created", "UTF-8"))
                                     
-                                    elif request[0] == 'LIST':
-                                        if request[1] in GROUPS.keys():
-                                            for i in GROUPS[request[1]]:
-                                                print(i)
-                                        else:
-                                            dict_socket.send(bytes("No group exists with this name", "UTF-8"))
-                                        
+                                    # elif request[0] == 'LIST':
+                                    #     if request[1] in GROUPS.keys():
+                                    #         for i in GROUPS[request[1]]:
+                                    #             print(i)
+                                    #     else:
+                                    #         dict_socket.send(bytes("No group exists with this name", "UTF-8"))   
                                     else:
                                         for client_dict in CONNECTED_CLIENTS:
                                             for dict_username, dict_socket in client_dict.items():

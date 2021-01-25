@@ -4,18 +4,8 @@ from sys import argv
 import clientUtils as cUtils
 import gui
 from random import randint
-# import gensafeprime
+from getpass import getpass
 from pyDes import *
-# import sys
-
-
-def get_generator(p):
-    one = 1
-    gen = 0
-    while one == 1:
-        gen = randint(2, p-2)
-        one = pow(gen, 2, p)
-    return gen
 
 SERVER_PORT = 5003
 p = 307662152597849524039519709992560403259
@@ -35,8 +25,7 @@ class LoginGUI:
         def login_or_register(should_login):
             print('Enter Username:')
             user = str(input())
-            print('Enter Password:')
-            password = str(input())
+            password = getpass(prompt="Enter Password: ")
             if not user or not password:
                 print('Please fill in all required fields!')
             else:
@@ -108,8 +97,8 @@ class LoginGUI:
                     print("Decrypted message: ", decrypted_message)
                     self.recv_public_key = None
                     break                
-        print("Exited While")
-        # sys.exit()
+        # print("Exited While")
+
     def recv_from_comm_server(self, comm_server_port):
         self.p2p_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.p2p_socket.connect(("localhost", comm_server_port))
@@ -133,7 +122,8 @@ class LoginGUI:
         encrypted_message = self.encrypt()
         print("Encrypted message: ", encrypted_message)
         self.p2p_socket.send(encrypted_message)
-        print("Is socket closing")
+        # print("Is socket closing")
+        self.recv_public_key = None
         self.p2p_socket.close()
 
 def server_login_cb(client_object, should_login, p_user, p_pass):

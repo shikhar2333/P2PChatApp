@@ -24,15 +24,6 @@ def receive(sock):
     length, = struct.unpack('!I', lengthbuf)
     return recvall(sock, length)
 
-
-# def p2p(client_socket,CONNECTED_CLIENTS,username):
-#     data = client_socket.recv(1024)
-#     decoded = None #to be done
-#     for client_dict in CONNECTED_CLIENTS:
-#         for dict_username, dict_socket in client_dict.items():
-#             if dict_username == username:
-#                 dict_socket.send(bytes(("Message from " + username + ": " + decoded),"UTF-8"))
-
 def joingroup(client_socket,GROUPS,gdecoded,username):
     send(client_socket,"JOIN")
     # client_socket.sendall(bytes("JOIN", "UTF-8"))
@@ -41,12 +32,10 @@ def joingroup(client_socket,GROUPS,gdecoded,username):
         GROUPS[str(groupname)]=[]
     
     if username in set(GROUPS[str(groupname)]):
-        send(client_socket,"You are already added to group\n")
-        # client_socket.send(bytes("You are already added to group\n", "UTF-8"))
+        send(client_socket, "You are already added to group")
     else:
         GROUPS[str(groupname)].append(username)
-        send(client_socket,"You are added to group\n")
-        # client_socket.send(bytes("You are added to group\n", "UTF-8"))
+        send(client_socket, "You are added to group")
 
 def listgroup(client_socket,GROUPS,gdecoded):
     send(client_socket,"LIST")

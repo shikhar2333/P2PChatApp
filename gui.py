@@ -10,8 +10,6 @@ from dbMethods import DBMethods
 from methods import *
 
 SERVER_PORT = 5003
-# COMM_SERVER_PORT = 5004
-
 def start_gui(client_object):
     client_socket = client_object.client_socket
     def on_closing():
@@ -23,7 +21,6 @@ def start_gui(client_object):
         read_sockets, write_socket, error_socket = select.select(sockets_list,[],[])
         for socks in read_sockets:  
             if socks == client_socket:
-                # data = client_socket.recv(1024)
                 data = receive(client_socket)
                 data = data.decode('UTF-8')
                 client_server_port = client_object.comm_server_port
@@ -42,10 +39,8 @@ def start_gui(client_object):
                     Thread(target=client_object.listen_to_peers).start()
                     port = "Port "+str(client_object.comm_server_port)+" "+username
                     send(client_socket, port)
-                    # client_socket.send(bytes((), "UTF-8"))
                 elif "Port" in data:
                     comm_port = int(data.split(" ")[1])
-                    # Thread(target=client_object.recv_from_comm_server, args=[comm_port]).start()
                     client_object.recv_from_comm_server(comm_port)
                 elif data == "JOIN":
                     data = receive(client_socket)
@@ -75,7 +70,6 @@ def start_gui(client_object):
                     if DBMethods.is_username_valid(sent_usr):
                         start_server = "Tell " + sent_usr + " to start server for " + client_object.username
                         send(client_socket, start_server)
-                        # client_socket.send(bytes((start_server), "UTF-8"))
                     else:
                         print("Username doesn't exist")
                 elif req_sent[0] == "JOIN":
@@ -86,7 +80,3 @@ def start_gui(client_object):
                     send(client_socket, message)
                 else:
                     pass
-                # sys.stdout.write("You to " + sent_usr +" :")
-                # msg = message.split(' ',2)[2]
-                # sys.stdout.write(msg)  
-                # sys.stdout.flush()

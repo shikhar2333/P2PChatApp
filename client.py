@@ -104,11 +104,10 @@ class LoginGUI:
                     # peer_socket.send(public_key)
                     self.sendb(peer_socket, public_key)
                 else:
-                    # print(data)
                     decrypted_message = self.decrypt(data)
                     decrypted_message = decrypted_message.decode("UTF-8")
-                    # final_message = decrypted_message.split(" ", 2)[2]
-                    print("Decrypted message: ", decrypted_message)
+                    final_message = decrypted_message.split(" ", 2)[2]
+                    print("Decrypted message: ", final_message)
                     self.recv_public_key = None
                     break                
         # print("Exited While")

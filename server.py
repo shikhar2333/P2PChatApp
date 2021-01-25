@@ -1,5 +1,4 @@
 import re
-# from socket import *
 from threading import Thread
 import time
 from dbMethods import DBMethods
@@ -19,21 +18,6 @@ def get_generator(p):
 CONNECTED_CLIENTS = []
 MAX_CLIENTS = 10
 GROUPS = {}
-
-class messageObject:
-    def __init__(self, sender, recipient, message):
-        self.sender = sender
-        self.recipient = recipient
-        self.message = message
-
-    def getSender(self):
-        return self.sender
-
-    def getRecipient(self):
-        return self.recipient
-
-    def getMessage(self):
-        return self.message
 
 def main():
     global server_socket
@@ -88,27 +72,23 @@ def get_jwt(req):
             return req[1]    
 
 def listenToClient(client_socket, client_address):
-    while 1:
+    while True:
         try:
             data = receive(client_socket)
-            
-            if data is not None:
+            if data:
                 request = re.split(" +", data.decode())
-                if request is not None:
+                if request:
                     jwt = get_jwt(request)
-                    if jwt is not None:
+                    if jwt:
                         decoded_jwt = sUtils.decodeJWT(jwt)
                         print('Login success')
                         username = decoded_jwt.get('username')
                         client_dic = {username: client_socket}
                         CONNECTED_CLIENTS.append(client_dic)
                         send(client_socket, "<ACCEPTED>")
-                        # client_socket.send(bytes("<ACCEPTED>", "UTF-8"))
-
                         while True:
                             try:
                                 data = receive(client_socket)
-                                # data = client_socket.recv(1024)
                                 if data:
                                     decoded = data.decode()
                                     if decoded == "SEND":
@@ -118,7 +98,6 @@ def listenToClient(client_socket, client_address):
                                             u_name = decoded.split(" ")[1]
                                             dict_socket = get_client_socket(u_name)
                                             send(dict_socket, decoded)
-                                        # dict_socket.send(bytes((decoded), "UTF-8"))
                                     elif decoded == "JOIN":
                                         gdata = receive(client_socket)
                                         gdecoded = gdata.decode()
@@ -135,37 +114,7 @@ def listenToClient(client_socket, client_address):
                                         u_name = decoded.split(" ")[-1]
                                         dict_socket = get_client_socket(u_name)
                                         send(dict_socket, decoded)
-                                        # dict_socket.send(bytes((decoded), "UTF-8"))
- 
-                                    # elif request[0] == '/something':
-                                    #     dict_socket.send(bytes("I did something", "UTF-8"))
-                                    
-                                    # elif request[0] == 'JOIN':
-                                    #     if request[1] not in GROUPS.keys():
-                                    #         GROUPS[str(request[1])]=[]
-                                    #         dict_socket.send(bytes("Group Created", "UTF-8"))
-                                        
-                                    #     GROUPS[str(request[1])].append(username)
-                                    #     dict_socket.send(bytes("You are added to group", "UTF-8"))
-
-
-                                    # elif request[0] == 'CREATE':
-                                    #     if request[1] in GROUPS.keys():
-                                    #         dict_socket.send(bytes("Group already exists", "UTF-8"))
-                                    #     else:    
-                                    #         GROUPS[str(request[1])]=[]
-                                    #         dict_socket.send(bytes("Group Created", "UTF-8"))
-                                    
-                                    # elif request[0] == 'LIST':
-                                    #     if request[1] in GROUPS.keys():
-                                    #         for i in GROUPS[request[1]]:
-                                    #             print(i)
-                                    #     else:
-                                    #         dict_socket.send(bytes("No group exists with this name", "UTF-8"))   
                                     else:
-                                        # for client_dict in CONNECTED_CLIENTS:
-                                        #     for dict_username, dict_socket in client_dict.items():
-                                        #         dict_socket.send(bytes((username + ": " + decoded), "UTF-8"))
                                         pass
                                 else:
                                     raise error()
@@ -173,14 +122,11 @@ def listenToClient(client_socket, client_address):
                                 print("Client disconnected:", e_)
                                 CONNECTED_CLIENTS.remove(client_dic)
                                 client_socket.close()
-                                # sendUserLists()
                                 return False
                     else:
                         send(client_socket, "<DECLINED>")
-                        # client_socket.send(bytes("<DECLINED>", "UTF-8"))    
                 else:
                     send(client_socket, "<DECLINED>")
-                    # client_socket.send(bytes("<DECLINED>", "UTF-8"))
             else:
                 print("Client disconnected")
                 client_socket.close()
@@ -191,15 +137,6 @@ def listenToClient(client_socket, client_address):
             print("Client disconnected")
             client_socket.close()
             return False
-
-# def sendUserLists():
-#     usernameList = []
-#     for client_dict in CONNECTED_CLIENTS:
-#         for dict_username, dict_socket in client_dict.items():
-#             usernameList.append(dict_username)
-#     for client_dict in CONNECTED_CLIENTS:
-#         for dict_username, dict_socket in client_dict.items():
-#             dict_socket.send(bytes(("/userlist " + " ".join(usernameList)), "UTF-8"))
 
 if __name__ == '__main__':
     main()

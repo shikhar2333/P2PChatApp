@@ -72,7 +72,6 @@ class LoginGUI:
         # self.comm_server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.comm_server_socket.bind(("", self.comm_server_port))
         self.comm_server_socket.listen(max_clients)
-        # self.comm_server_port = comm_server_port
     
     def listen_to_peers(self):
         peer_socket, peer_addr = self.comm_server_socket.accept()
@@ -94,7 +93,9 @@ class LoginGUI:
                 else:
                     # print(data)
                     decrypted_message = self.decrypt(data)
-                    print("Decrypted message: ", decrypted_message)
+                    decrypted_message = decrypted_message.decode("UTF-8")
+                    final_message = decrypted_message.split(" ", 2)[2]
+                    print("Decrypted message: ", final_message)
                     self.recv_public_key = None
                     break                
         # print("Exited While")

@@ -44,3 +44,16 @@ class DBMethods:
     @staticmethod
     def closeConnection():
         DBMethods.connection.close()
+
+    @staticmethod
+    def is_username_valid(username):
+        conn = DBMethods.connection
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM users WHERE username = %s", [username])
+                user = cursor.fetchone()
+                if user is None:
+                    return False
+                return True
+        except Exception as e:
+            print("getUserFromDB Error:", e)

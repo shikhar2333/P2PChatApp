@@ -6,6 +6,7 @@ import re
 import select  
 import sys
 import random
+from dbMethods import DBMethods
 
 SERVER_PORT = 5003
 # COMM_SERVER_PORT = 5004
@@ -49,10 +50,17 @@ def start_gui(client_object):
             else:  
                 message = sys.stdin.readline()  
                 client_object.message = message
-                sent_usr = message.split(' ')[1]
-                start_server = "Tell " + sent_usr + " to start server for " + client_object.username
-                # print(start_server)
-                client_socket.send(bytes((start_server), "UTF-8"))
+                split_message = message.split(" ")
+                if len(split_message) >= 3:
+                    is_send = split_message[0]
+                    if is_send == "SEND":
+                        sent_usr = split_message[1]
+                        if DBMethods.is_username_valid(sent_usr):
+                            start_server = "Tell " + sent_usr + " to start server for " + client_object.username
+                            client_socket.send(bytes((start_server), "UTF-8"))
+                        else:
+                            print("Username doesn't exist")
+                    
                 # sys.stdout.write("You to " + sent_usr +" :")
                 # msg = message.split(' ',2)[2]
                 # sys.stdout.write(msg)  

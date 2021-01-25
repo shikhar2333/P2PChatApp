@@ -1,12 +1,13 @@
 import os
 from threading import Thread
-import socket
+# import socket
 from sys import argv
 import re
 import select  
 import sys
 import random
 from dbMethods import DBMethods
+from methods import *
 
 SERVER_PORT = 5003
 # COMM_SERVER_PORT = 5004
@@ -22,10 +23,9 @@ def start_gui(client_object):
         read_sockets, write_socket, error_socket = select.select(sockets_list,[],[])
         for socks in read_sockets:  
             if socks == client_socket:
-                data = client_socket.recv(1024)
+                # data = client_socket.recv(1024)
+                data = receive(client_socket)
                 data = data.decode('UTF-8')
-                # request = data.split(' ', 3)
-                # command = request[3].split(' ',2)
                 client_server_port = client_object.comm_server_port
                 start_server = "start server"
                 if start_server in data:
@@ -40,27 +40,52 @@ def start_gui(client_object):
                     username = data.split(" ")[-1]
                     print("Communication server port: ", client_object.comm_server_port)
                     Thread(target=client_object.listen_to_peers).start()
-                    client_socket.send(bytes(("Port "+str(client_object.comm_server_port)+" "+username), "UTF-8"))
+                    port = "Port "+str(client_object.comm_server_port)+" "+username
+                    send(client_socket, port)
+                    # client_socket.send(bytes((), "UTF-8"))
                 elif "Port" in data:
                     comm_port = int(data.split(" ")[1])
                     # Thread(target=client_object.recv_from_comm_server, args=[comm_port]).start()
                     client_object.recv_from_comm_server(comm_port)
-                else:
-                    pass
+                elif data == "JOIN":
+                    data = receive(client_socket)
+                    decode = data.decode()
+                    print(decode)
+                elif data == "CREATE":
+                    data = receive(client_socket)
+                    decode = data.decode()
+                    print(decode)
+                elif data == "LIST":
+                    data = receive(client_socket)
+                    if data:
+                        data = data.decode('utf-8')
+                        if data == "Error":
+                            print('No Group Exists')
+                        else:
+                            data_loaded = json.loads(data)
+                            for gname,user in data_loaded.items():
+                                print(gname,len(user))
             else:  
                 message = sys.stdin.readline()  
-                client_object.message = message
-                split_message = message.split(" ")
-                if len(split_message) >= 3:
-                    is_send = split_message[0]
-                    if is_send == "SEND":
-                        sent_usr = split_message[1]
-                        if DBMethods.is_username_valid(sent_usr):
-                            start_server = "Tell " + sent_usr + " to start server for " + client_object.username
-                            client_socket.send(bytes((start_server), "UTF-8"))
-                        else:
-                            print("Username doesn't exist")
-                    
+                req_sent = message.split(" ")
+                send(client_socket, req_sent[0])
+                if len(req_sent)>=3 and req_sent[0] == "SEND":
+                    sent_usr = req_sent[1]
+                    client_object.message = message
+                    if DBMethods.is_username_valid(sent_usr):
+                        start_server = "Tell " + sent_usr + " to start server for " + client_object.username
+                        send(client_socket, start_server)
+                        # client_socket.send(bytes((start_server), "UTF-8"))
+                    else:
+                        print("Username doesn't exist")
+                elif req_sent[0] == "JOIN":
+                    send(client_socket, message)
+                elif req_sent[0] == "LIST\n":
+                    send(client_socket, message)
+                elif req_sent[0] == "CREATE":
+                    send(client_socket, message)
+                else:
+                    pass
                 # sys.stdout.write("You to " + sent_usr +" :")
                 # msg = message.split(' ',2)[2]
                 # sys.stdout.write(msg)  

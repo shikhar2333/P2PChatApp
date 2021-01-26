@@ -7,6 +7,7 @@ from random import randint
 from getpass import getpass
 from pyDes import *
 from methods import *
+import uuid
 
 SERVER_PORT = 5003
 p = 307662152597849524039519709992560403259
@@ -25,6 +26,8 @@ class LoginGUI:
         self.p2p_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.secret_number = None
         self.recv_public_key = None
+        # list of groups the client is part of
+        self.client_groups = []
         def login_or_register(should_login):
             print('Enter Name:')
             user = str(input())
@@ -60,8 +63,8 @@ class LoginGUI:
         sock.sendall(struct.pack('!I', length))
         sock.sendall(data)
 
-    def decrypt(self, encrypted_message):
-        shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
+    def decrypt(self, encrypted_message, shared_secret_key):
+        # shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
         print("Secret number: ", self.secret_number)
         print("Shared secret key: ", shared_secret_key)
         key = shared_secret_key.to_bytes(24, byteorder='little')
@@ -69,8 +72,8 @@ class LoginGUI:
         decrypted_message = k.decrypt(encrypted_message, padmode=PAD_PKCS5)
         return decrypted_message
 
-    def encrypt(self):
-        shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
+    def encrypt(self, shared_secret_key):
+        # shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
         print("Secret number: ", self.secret_number)
         print("Shared secret key: ", shared_secret_key)
         key = shared_secret_key.to_bytes(24, byteorder='little')
@@ -104,7 +107,8 @@ class LoginGUI:
                     # peer_socket.send(public_key)
                     self.sendb(peer_socket, public_key)
                 else:
-                    decrypted_message = self.decrypt(data)
+                    shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
+                    decrypted_message = self.decrypt(data, shared_secret_key)
                     decrypted_message = decrypted_message.decode("UTF-8")
                     final_message = decrypted_message.split(" ", 2)[2]
                     print("Decrypted message: ", final_message)
@@ -134,7 +138,8 @@ class LoginGUI:
                 print(e)
                 break
         
-        encrypted_message = self.encrypt()
+        shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
+        encrypted_message = self.encrypt(shared_secret_key)
         print("Encrypted message: ", encrypted_message)
         # self.p2p_socket.send(encrypted_message)
         self.sendb(self.p2p_socket, encrypted_message)

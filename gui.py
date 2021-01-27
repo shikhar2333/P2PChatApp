@@ -81,7 +81,7 @@ def start_gui(client_object):
                                 data_loaded = json.loads(data)
                                 print("-"*15)
                                 for gname,user in data_loaded.items():
-                                    print(gname+"\t"+str(len(user)))
+                                    print(gname[:-1]+"\t"+str(len(user)))
                                 print("-"*15)
                                 
                 elif not f:

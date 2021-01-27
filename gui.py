@@ -1,6 +1,5 @@
 import os
 from threading import Thread
-# import socket
 from sys import argv
 import re
 import select  
@@ -8,7 +7,6 @@ import sys
 import random
 from dbMethods import DBMethods
 from methods import *
-# import group
 
 SERVER_PORT = 5003
 def sendb(sock, data):
@@ -107,7 +105,7 @@ def start_gui(client_object):
                         start_server = "Tell " + sent_usr + " to start server for " + client_object.username
                         send(client_socket, start_server)
                     else:
-                        print("Username doesn't exist")
+                        send(client_socket, "Username Error")
                 elif req_sent[0] == "JOIN":
                     send(client_socket, message)
                 elif req_sent[0] == "LIST\n":

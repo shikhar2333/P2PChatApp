@@ -1,5 +1,6 @@
 import gensafeprime
 from random import randint
+# Code for generating P,G for diffie-hellman key
 def power(x, y, p) : 
     res = 1   
     x = x % p  

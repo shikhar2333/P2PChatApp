@@ -3,10 +3,7 @@ from threading import Thread
 import time
 from dbMethods import DBMethods
 import serverUtils as sUtils
-import gensafeprime
-import group
 from methods import *
-import uuid
 
 CONNECTED_CLIENTS = []
 MAX_CLIENTS = 10

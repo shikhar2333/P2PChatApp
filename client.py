@@ -8,6 +8,7 @@ from getpass import getpass
 from pyDes import *
 from methods import *
 import uuid
+from hashlib import sha256
 
 SERVER_PORT = 5003
 p = 307662152597849524039519709992560403259
@@ -33,7 +34,7 @@ class LoginGUI:
             user = str(input())
             print('Enter Roll No:')
             roll_no = int(input())
-            self.roll = roll_no
+            self.roll = str(roll_no).encode()
             password = getpass(prompt="Enter Password: ")
             if not user or not password:
                 print('Please fill in all required fields!')
@@ -99,7 +100,11 @@ class LoginGUI:
                 if not self.recv_public_key:
                     self.recv_public_key = int.from_bytes(data, byteorder='little')
                     print("Received key: ", self.recv_public_key)
-                    self.secret_number =  randint(p - 1000, p)
+                    bytes_obj = uuid.uuid4().bytes + self.roll
+                    # take SHA256(Random Nonce || Roll No)
+                    self.secret_number = sha256(bytes_obj).digest()
+                    self.secret_number = int.from_bytes(self.secret_number, byteorder='little')
+                    self.secret_number = self.secret_number%p
                     public_key = pow(g, self.secret_number, p)
                     print("Public key to send: ", public_key)
                     public_key = public_key.to_bytes(24, byteorder='little')
@@ -118,7 +123,11 @@ class LoginGUI:
     def recv_from_comm_server(self, comm_server_port):
         self.p2p_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.p2p_socket.connect(("localhost", comm_server_port))
-        self.secret_number = randint(p -1000, p)
+        bytes_obj = uuid.uuid4().bytes + self.roll
+        # take SHA256(Random Nonce || Roll No)
+        self.secret_number = sha256(bytes_obj).digest()
+        self.secret_number = int.from_bytes(self.secret_number, byteorder='little')
+        self.secret_number = self.secret_number%p
         public_key = pow(g, self.secret_number, p)
         print("Public key to send: ", public_key)
         public_key = public_key.to_bytes(24, byteorder='little')

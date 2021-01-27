@@ -21,7 +21,7 @@ def check_error(data):
         data = data.decode()
         return True
     except UnicodeDecodeError:
-        print("Unicode error")
+        # print("Unicode error")
         return False
 
 def start_gui(client_object):
@@ -85,11 +85,16 @@ def start_gui(client_object):
                                     print(gname, len(user))
                 elif not f:
                     space_idx = data_recv.index(b' ')
-                    # print("Decryption key: ", data_recv[0: space_idx])
-                    gnonce = int(data_recv[0: space_idx])
-                    encrypted_message = data_recv[space_idx + 1:]
-                    decrypted_message = client_object.decrypt(encrypted_message, gnonce)
-                    print("Decrypted Message: ", decrypted_message.encode())
+                    sender = data_recv[0: space_idx].decode()
+                    # print("Sender: ", sender)
+                    data_recv = data_recv[space_idx + 1:]
+                    # print("Incoming message: ", data_recv)
+                    space_idx1 = data_recv.index(b' ')
+                    gnonce = int(data_recv[0: space_idx1])
+                    # print("Gnonce decrypt: ", gnonce)
+                    encrypted_message = data_recv[space_idx1 + 1:]
+                    decrypted_message = client_object.decrypt(encrypted_message, gnonce).decode()
+                    print("Group Message from " + sender + ": ", decrypted_message.split(" ", 1)[1])
             else:  
                 message = sys.stdin.readline()  
                 req_sent = message.split(" ")
@@ -97,7 +102,7 @@ def start_gui(client_object):
                     send(client_socket, req_sent[0])
                 if len(req_sent)>=3 and req_sent[0] == "SEND":
                     sent_usr = req_sent[1]
-                    client_object.message = message
+                    client_object.message = client_object.username + " " + message
                     if DBMethods.is_username_valid(sent_usr):
                         start_server = "Tell " + sent_usr + " to start server for " + client_object.username
                         send(client_socket, start_server)

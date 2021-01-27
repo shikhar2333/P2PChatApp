@@ -8,14 +8,6 @@ import group
 from methods import *
 import uuid
 
-def get_generator(p):
-    one = 1
-    gen = 0
-    while one == 1:
-        gen = randint(2, p-2)
-        one = pow(gen, 2, p)
-    return gen
-
 CONNECTED_CLIENTS = []
 MAX_CLIENTS = 10
 GROUPS = {}
@@ -80,7 +72,7 @@ def send_group_nonce(u_name):
 
 
 def send_group_message(uname, gname, encrypted_message):
-    gnonce = bytes(GROUP_NONCE[gname] + " ", "UTF-8")
+    gnonce = bytes(uname + " " + GROUP_NONCE[gname] + " ", "UTF-8")
     print("Group message: ", encrypted_message)
     for user in GROUPS[gname]:
         if user == uname:
@@ -103,7 +95,7 @@ def check_error(data):
         data = data.decode()
         return True
     except UnicodeDecodeError:
-        print("Unicode error")
+        # print("Unicode error")
         return False
 def listenToClient(client_socket, client_address):
     while True:
@@ -155,6 +147,7 @@ def listenToClient(client_socket, client_address):
                                 u_name = decoded.split(" ")[1]
                                 send_group_nonce(u_name)
                             elif "Error" in decoded:
+                                # send_group_message(username, decoded, b'')
                                 pass
                             else:
                                 pass

@@ -65,8 +65,8 @@ class LoginGUI:
 
     def decrypt(self, encrypted_message, shared_secret_key):
         # shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
-        print("Secret number: ", self.secret_number)
-        print("Shared secret key: ", shared_secret_key)
+        # print("Secret number: ", self.secret_number)
+        # print("Shared secret key: ", shared_secret_key)
         key = shared_secret_key.to_bytes(24, byteorder='little')
         k = triple_des(key, CBC, initial_value_bits, pad=None, padmode=PAD_PKCS5)
         decrypted_message = k.decrypt(encrypted_message, padmode=PAD_PKCS5)
@@ -74,8 +74,8 @@ class LoginGUI:
 
     def encrypt(self, shared_secret_key):
         # shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
-        print("Secret number: ", self.secret_number)
-        print("Shared secret key: ", shared_secret_key)
+        # print("Secret number: ", self.secret_number)
+        # print("Shared secret key: ", shared_secret_key)
         key = shared_secret_key.to_bytes(24, byteorder='little')
         k = triple_des(key, CBC, initial_value_bits, pad=None, padmode=PAD_PKCS5)
         encrypted_message = k.encrypt(self.message)
@@ -96,7 +96,6 @@ class LoginGUI:
                 data = receive(peer_socket)
                 if not data:
                     break
-                # print("Is received key none: ", self.recv_public_key)
                 if not self.recv_public_key:
                     self.recv_public_key = int.from_bytes(data, byteorder='little')
                     print("Received key: ", self.recv_public_key)
@@ -110,11 +109,11 @@ class LoginGUI:
                     shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
                     decrypted_message = self.decrypt(data, shared_secret_key)
                     decrypted_message = decrypted_message.decode("UTF-8")
-                    final_message = decrypted_message.split(" ", 2)[2]
-                    print("Decrypted message: ", final_message)
+                    sender = decrypted_message.split(" ")[0]
+                    final_message = decrypted_message.split(" ", 3)[3]
+                    print("Message from " + sender + ": ", final_message)
                     self.recv_public_key = None
                     break                
-        # print("Exited While")
 
     def recv_from_comm_server(self, comm_server_port):
         self.p2p_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -141,9 +140,7 @@ class LoginGUI:
         shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
         encrypted_message = self.encrypt(shared_secret_key)
         print("Encrypted message: ", encrypted_message)
-        # self.p2p_socket.send(encrypted_message)
         self.sendb(self.p2p_socket, encrypted_message)
-        # print("Is socket closing")
         self.recv_public_key = None
         self.p2p_socket.close()
 

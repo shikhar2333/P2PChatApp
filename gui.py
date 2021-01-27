@@ -80,7 +80,7 @@ def start_gui(client_object):
                             else:
                                 data_loaded = json.loads(data)
                                 for gname,user in data_loaded.items():
-                                    print(gname, len(user))
+                                    print(gname+"\t"+str(len(user)))
                 elif not f:
                     space_idx = data_recv.index(b' ')
                     sender = data_recv[0: space_idx].decode()

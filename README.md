@@ -18,10 +18,11 @@ $ python client.py
 Note: Run server and client on different terminals. Supports upto 10 clients(on different terminals).
 
 ### Commands:
-- SEND <username> <message> : Sends message(encrypted) to a peer/client named <username>, p2p command.
-- CREATE <groupname> : Client executing this command creates and joins the group named <groupname>.
-- JOIN <groupname> : Client executing this command joins the group named <groupname>.
-- LIST : Lists the groupnames and no. of users in them
-- GROUP <message> : Client executing this command sends the message(encrypted) in the group/all the members in the group. 
+- ```SEND username message``` : Sends message(encrypted) to a peer/client named username, p2p command.
+- ```SEND FILE username filename_path``` : Sends text file(encrypted) to a peer/client named username.
+- ```CREATE groupname``` : Client executing this command creates and joins the group named groupname.
+- ```JOIN groupname``` : Client executing this command joins the group named groupname.
+- ```LIST``` : Lists the groupnames and no. of users in them
+- ```GROUP message``` : Client executing this command sends the message(encrypted) in the group/all the members in the group. 
 
 ![img](./ChatApp.png)

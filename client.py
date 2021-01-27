@@ -113,12 +113,18 @@ class LoginGUI:
                 else:
                     shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
                     decrypted_message = self.decrypt(data, shared_secret_key)
-                    decrypted_message = decrypted_message.decode("UTF-8")
-                    sender = decrypted_message.split(" ")[0]
-                    final_message = decrypted_message.split(" ", 3)[3]
-                    print("Message from " + sender + ": ", final_message)
+                    # decrypted_message = decrypted_message
+                    sender = decrypted_message.split(b' ')[0]
+                    final_message = decrypted_message.split(b' ', 3)[3]
+                    print("Message from " + sender.decode() + ": ", final_message.decode())    
+                    space_idx = decrypted_message.index(b' ')
+                    # sender = decrypted_message[:space_idx]
+                    # print("Received file from: ",sender)
+                    f = open("sample.txt", "wb")
+                    f.write(decrypted_message[space_idx+1:])
+                    f.close()
                     self.recv_public_key = None
-                    break                
+                    break
 
     def recv_from_comm_server(self, comm_server_port):
         self.p2p_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -148,10 +154,11 @@ class LoginGUI:
         
         shared_secret_key = pow(self.recv_public_key, self.secret_number, p)
         encrypted_message = self.encrypt(shared_secret_key)
-        print("Encrypted message: ", encrypted_message)
+        # print("Encrypted message: ", encrypted_message)
         self.sendb(self.p2p_socket, encrypted_message)
         self.recv_public_key = None
         self.p2p_socket.close()
+        print("ExitedWhile")
 
 def server_login_cb(client_object, should_login, p_user, p_roll, p_pass):
 

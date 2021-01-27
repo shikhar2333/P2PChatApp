@@ -119,6 +119,7 @@ def listenToClient(client_socket, client_address):
                                 dict_socket = get_client_socket(username)
                                 decoded = receive(dict_socket).decode()
                                 if "start" in decoded:
+                                    print(decoded)
                                     u_name = decoded.split(" ")[1]
                                     dict_socket = get_client_socket(u_name)
                                     send(dict_socket, decoded)
